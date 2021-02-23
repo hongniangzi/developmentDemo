@@ -1,0 +1,46 @@
+{extend name="base/common-index"/}
+{block name="main"}
+    <div>
+        测试开发模板
+    </div>
+    <div>
+        @王伦
+        573075930@qq.com
+    </div>
+    
+    <script type="text/javascript" src="__JS__/jquery.flexslider-min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('.flexslider').flexslider({
+            directionNav: true,
+            pauseOnAction: false
+        });
+    });
+    </script>
+    <script src="__JS__/jquery.SuperSlide.sx.js"></script>
+    <script type="text/javascript"> 
+    //  jQuery(".txtScroll-left").slide({titCell:".hd ul",mainCell:".bd ul",autoPage:true,effect:"topLoop",autoPlay:true,scroll:1,vis:5,trigger:"click"}); 
+    </script>
+    <script>
+        $(window).scroll(function() {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        
+        // if (scrollTop>0){
+        //     $('.headerbar').addClass('headerbarhov');
+        //     $('.headerbar .logo').css('display','none');
+        //     $('.headerbar .logo02').css('display','block');
+        //     $('.headerbar .links ul.fixed').css('display','none');
+        //     $('.headerbar .links ul.hover').css('display','block');
+        // }else{
+        //     // $('.headerbar').attr('hov','0');
+        //     $('.headerbar').removeClass('headerbarhov');
+        //     $('.headerbar .logo').css('display','block');    
+        //     $('.headerbar .logo02').css('display','none');
+        //     $('.headerbar .links ul.fixed').css('display','block');
+        //     $('.headerbar .links ul.hover').css('display','none');
+        // }
+    });
+
+    </script>
+{/block}
+

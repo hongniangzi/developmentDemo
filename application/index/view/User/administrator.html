@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>管理员设置</title>
+    </head>
+    <body>
+        <h2>{$Think.session.Nickname.username}</h2>
+        <a href="{:url('/user/logOut')}">退出</a>
+        <ul>
+            <li><a href="{:url('/user/addUser')}">新增用户</a></li>
+            <li><a href="{:url('/rule/authority')}">权限管理</a></li>
+            <li><a href="{:url('/user/log')}">用户行为</a></li>
+        </ul>
+        
+
+        <script src="__JS__/jquery-3.4.1.min.js"></script>
+        <script src="__JS__/parmies-ajax.js"></script>
+        <script src="__JS__/layui/layui.js"></script>
+        <script>
+            layui.use(['layer'], function(){
+                const layer = layui.layer;
+
+                
+            })
+        </script>
+    </body>
+</html>

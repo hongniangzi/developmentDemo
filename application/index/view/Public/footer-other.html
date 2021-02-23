@@ -1,0 +1,67 @@
+
+<div class="footerbar">
+	<div class="footer">
+		<div class="fl">
+			<h2>联系我们</h2>
+			<p>邮箱地址：{:C('WEB_COMPANY_EMAIL')}</p>
+			<p>公司地址：{:C('WEB_COMPANY_ADDRESS')}</p>
+		</div>
+		<div class="fr">
+			<ul>
+				<li>
+					<h2>微信公众号</h2>
+					<div class="imgbox"><img src="__IMG__/wechat.jpg"></div>
+				</li>
+				<li>
+					<h2>微信小程序</h2>
+					<div class="imgbox"><img src="__IMG__/wexcx.jpg"></div>
+				</li>
+			</ul>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+	<div class="copyright">
+		<p>{:C('WEB_COPYRIGHT')}  <a href="https://beian.miit.gov.cn/" target="_blank">{:C('WEB_CASE_NUMBER')}</a> | <a href="#" target="_blank">湘公网安备:11010802250031</a> <span>技术支持：蒲公英<a href="http://www.0731pgy.com/" target="_blank">长沙网站建设</a></span></p>
+	</div>
+</div>
+
+
+
+<script src="__JS__/jquery.SuperSlide.sx.js"></script>
+<script type="text/javascript"> 
+ jQuery(".txtScroll-left").slide({titCell:".hd ul",mainCell:".bd ul",autoPage:true,effect:"leftLoop",autoPlay:true,scroll:1,vis:1,trigger:"click"}); 
+</script>
+<script type="text/javascript" src="__JS__/jquery.flexslider-min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('.flexslider').flexslider({
+          directionNav: true,
+          pauseOnAction: false
+      });
+  });
+
+  
+</script>
+
+<script type="text/javascript">
+  //选项卡 designed by tinisn
+  //menus 菜单li的ul id;
+  //divs 选项对应div的父级div id;
+  //sdivClass 选项对应div的class需要加'.',可为空
+  //hovClass 菜单选中时的class
+  function scrollBar(menus,divs,sdivClass,hovClass){
+    // alert($(menus + ' li').size());
+    // alert($(divs + ' div.p-b2').size());
+   if($(menus + ' li').size() != $(divs + ' div' + sdivClass).size())
+   {
+  alert("菜单层数量和内容层数量不一样!");
+  return false;
+   }
+   $(menus + ' li').bind('click', function(e){
+    // alert($(this).index());
+    $(menus + ' li').removeClass(hovClass).eq($(this).index()).addClass(hovClass);
+    $(divs + ' div' + sdivClass).css('display', 'none').eq($(this).index()).css('display', 'block');
+   });
+  }
+  scrollBar('#menus', '#divs', '.box', 'h1');
+</script>

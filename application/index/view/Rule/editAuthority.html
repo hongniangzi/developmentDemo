@@ -1,0 +1,85 @@
+
+{extend name="base/common" /}
+{block name="title"}路由规则管理(编辑){/block}
+
+{block name="main"}
+    <!--  -->
+    <div class="rbox">
+        <div class="top">
+            <h2>分组管理(新增)</h2>
+        </div>
+        <div class="btm">
+            <form id="myForm">
+                <table border="0" cellpadding="0" cellspacing="0" class="table02" width="400">
+                    <tr>
+                        <td align="right" width="100">标题：</td>
+                        <td><input type="text" name="title" class="intxt" value="{$info.title|default=''}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">路由链接：</td>
+                        <td><input type="text" name="route" class="intxt" value="{$info.route|default=''}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">规则类型：</td>
+                        <td>
+                            <input type="radio" name="route_type" value="1" {$info.route_type==1?"checked":""}>仅栏目&emsp;
+                            <input type="radio" name="route_type" value="2" {$info.route_type==2?"checked":""}>仅动作&emsp;
+                            <input type="radio" name="route_type" value="3" {$info.route_type==3?"checked":""}>栏目/动作&emsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">图标地址(支持网络地址)：</td>
+                        <td><input type="text" name="icon" class="intxt" value="{$info.icon|default=''}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">路由类型：</td>
+                        <td><input type="text" name="type" class="intxt" value="{$info.type|default=''}"></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">状态：</td>
+                        <td>
+                            <input type="radio" name="status" value="1" {$info.status==1?"checked":""}>启用
+                            <input type="radio" name="status" value="0" {$info.status==0?"checked":""}>禁用
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">排序优先级：</td>
+                        <td><input type="text" name="level" class="intxt" value="{$info.level|default=''}"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type="hidden" value="{$info.id|default=''}" name="id">
+                            <input type="hidden" value="{$info.pid|default=0}" name="pid">
+                            <input type="button" value="确认" class="inbtn" id="formButton">
+                            <input type="button" value="返回" class="inback" onclick="window.history.back();">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <!--  -->
+    <script>
+        layui.use(['layer'], function(){
+            const layer = layui.layer;
+
+            $('#myForm #formButton').click(function(){
+                $(this).attr('disabled','disabled');
+                layer.load();
+                const formData = new FormData($('#myForm')[0]);
+                parimesPost("/rule/editAuthority",formData).then((res)=>{
+                    layer.msg(res.Msg);
+                    if(res.status==1){
+                        // 跳转
+                        window.location.href='/rule/authorityList.html';
+                    }
+                }).catch((error)=>{
+                    layer.msg(error);
+                })
+                $(this).removeAttr('disabled');
+                layer.closeAll('loading');
+            })
+        })
+    </script>
+{/block}

@@ -1,0 +1,78 @@
+{extend name="base/common" /}
+{block name="title"}参数配置{/block}
+
+{block name="main"}
+    
+    <!--  -->
+    <div class="rbox">
+        <div class="top">
+            <h2>参数配置</h2>
+            <div class="links">
+                [
+                <a href="{:url('/system/configValue')}" {if condition="$group_id==''"}class="hov"{/if}>全部</a>
+                {volist name=":getConfigGroup()" id="group"}
+                    <a href="{:url('/system/configValue',array('group'=>$group[0]))}" {eq name="group[0]" value="$group_id"}class="hov"{/eq}>{$group[1]}</a>
+                {/volist}
+                ]
+            </div>
+        </div>
+        <div class="ctr">
+            <a href="{:url('/system/addConfigValue')}" class="add">新增配置</a>
+            <div class="seach">
+                <input type="text" class="intext" name="name">
+                <input type="button" class="inbtn" value="搜索" onclick="return seachButton();">
+            </div>
+            
+        </div>
+        <div class="btm">
+            <form>
+                <table class="table01" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th width="100">ID</th>
+                        <th width="100">参数名</th>
+                        <th width="100">标题</th>
+                        <th width="100">分组</th>
+                        <th width="100">类型</th>
+                        <th width="150">操作</th>
+                    </tr>
+                    {volist name="list" id="doc"}
+                    <tr>
+                        <td>{$doc.id}</td>
+                        <td><a href="{:url('/system/addConfigValue',array('id'=>$doc['id']))}">{$doc.name}</a></td>
+                        <td>{$doc.title}</td>
+                        <td>{$doc.group|getConfigGroup}</td>
+                        <td>{$doc.type|getConfigType}</td>
+                        <td>
+                            <a href="{:url('/system/addConfigValue',array('id'=>$doc['id']))}">编辑</a>
+                            <a href="{:url('/system/delConfigValue',array('id'=>$doc['id']))}" onclick="return confirm('您确定要删除吗?');">删除</a>
+                        </td>
+                    </tr>
+                    {/volist}
+                </table>
+            </form>
+            {:htmlspecialchars_decode($page->render)}
+        </div>
+    </div>
+    <!--  -->
+    
+    <script>
+
+        layui.use(['layer'], function(){
+            const layer = layui.layer;
+
+            layer.load();
+
+            layer.closeAll('loading');
+        })
+        // name搜索
+        function seachButton(){
+            const name = $('input[name="name"]').val();
+            if(!name){
+                alert('请输入搜索内容');
+                return false;
+            }
+            window.location.href += `?name=${name}`;
+            console.log(window.location);
+        }
+    </script>
+{/block}

@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>管理中心</title>
+    </head>
+    <body>
+        <h2>{$Think.session.Nickname.username}</h2>
+        <a href="{:url('/user/logOut')}">退出</a>
+
+        <ul>
+            <li>
+                <!-- <a href="{:url('/user/administrator')}">管理员设置</a> -->
+                <a href="javascript:;">管理员设置</a>
+                <ul>
+                    <li><a href="{:url('/user/addUser')}">新增用户</a></li>
+                    <li>
+                        <!-- <a href="{:url('/rule/authority')}">权限管理</a> -->
+                        <a href="javascript:;">权限管理</a>
+                        <ul>
+                            <li><a href="{:url('/rule/authorityGroupList')}">权限分组</a></li>
+                            <li><a href="{:url('/rule/authorityList')}">规则列表</a></li>
+                            <li><a href="{:url('/user/listUser')}">用户授权</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{:url('/user/log')}">用户行为</a></li>
+                </ul>
+            </li>
+            <li><a href="{:url('/audit/bossAccountList')}">企业账号审核</a></li>
+            <li><a href="{:url('/audit/workerAccountList')}">职业者账号审核</a></li>
+            <li><a href="{:url('/audit/bossReleaseList')}">需求审核</a></li>
+            <li><a href="{:url('/')}">企业签约审核</a></li>
+            <li><a href="{:url('/')}">职业者签约审核</a></li>
+            <li><a href="{:url('/audit/workerIndividual')}">职业者个人变动签约</a></li>
+            <li>
+                <a href="javascript:;">费用结算</a>
+                <ul>
+                    <li><a href="{:url('/money/budgetSalary')}">预算工资</a></li>
+                </ul>
+            </li>
+        </ul>
+        
+
+        <script src="__JS__/jquery-3.4.1.min.js"></script>
+        <script src="__JS__/parmies-ajax.js"></script>
+        <script src="__JS__/layui/layui.js"></script>
+        <script>
+            layui.use(['layer'], function(){
+                const layer = layui.layer;
+
+                
+            })
+        </script>
+    </body>
+</html>

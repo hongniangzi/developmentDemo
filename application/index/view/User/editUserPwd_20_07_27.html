@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>编辑管理用户(密码)</title>
+    </head>
+    <body>
+        <h2>{$Think.session.Nickname.username}</h2>
+        <a href="{:url('/user/logOut')}">退出</a>
+
+        <form action="" id="myForm">
+            <table>
+                <tr>
+                    <td><input type="text" value="{$info.username|default=''}" disabled></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="password" placeholder="新密码"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" name="password_confirm" placeholder="确认密码"></td>
+                </tr>
+                
+                <tr>
+                    <td><input type="button" value="确认" id="formButton"></td>
+                </tr>
+            </table>
+        </form>
+        
+
+        <script src="__JS__/jquery-3.4.1.min.js"></script>
+        <script src="__JS__/parmies-ajax.js"></script>
+        <script src="__JS__/layui/layui.js"></script>
+        <script>
+            layui.use(['layer'], function(){
+                const layer = layui.layer;
+
+                $('#myForm #formButton').click(function(){
+                    $(this).attr('disabled','disabled');
+                    layer.load();
+                    const formData = new FormData($('#myForm')[0]);
+                    parimesPost("/user/editUserPwd",formData).then((res)=>{
+                        layer.msg(res.Msg);
+                        if(res.status==1){
+                            // 跳转
+                           window.location.href='/user/authorization.html';
+                        }
+                    }).catch((error)=>{
+                        layer.msg(error);
+                    })
+                    $(this).removeAttr('disabled');
+                    layer.closeAll('loading');
+                })
+            })
+        </script>
+    </body>
+</html>

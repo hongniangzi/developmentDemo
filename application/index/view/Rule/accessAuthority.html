@@ -1,0 +1,104 @@
+{extend name="base/common" /}
+{block name="title"}用户访问授权设置{/block}
+
+{block name="main"}
+    <div class="rbox">
+        <div class="top">
+            <h2>{$user_group.title|default=''}</h2>
+        </div>
+        <div class="btm">
+            <form action="" id="myForm_group">
+            
+                {volist name="rule" id="doc_1"}
+                {// 一级}
+                <div class="qxbox">
+                    <div class="t">
+                        <h2>{$doc_1.type}</h2>
+                    </div>
+                    <div class="b">
+                        <h3>
+                            <label>
+                                <input type="checkbox" class="incheck" name="rule[]" value="{$doc_1.id}" title="{$doc_1.route}" pid="{$doc_1.pid}" {:explodeCheck($user_group['rule'],$doc_1['id'])?'checked="checked"':''}>{$doc_1.title}
+                                
+                            </label>
+                        </h3>
+                        <ul>
+                            {volist name="doc_1.list" id="doc_2"}
+                            {// 二级}
+                            <li class="o">
+                                <h4>
+                                    <label>
+                                        <input type="checkbox" class="incheck" name="rule[]" value="{$doc_2.id}" title="{$doc_2.route}" pid="{$doc_2.pid}" {:explodeCheck($user_group['rule'],$doc_2['id'])?'checked="checked"':''}>{$doc_2.title}
+                                        
+                                    </label>
+                                </h4>
+                                <dl>
+                                    {volist name="doc_2.list" id="doc_3"}
+                                    {// 三级}
+                                    <dd>
+                                        <label>
+                                            <input type="checkbox" class="incheck" name="rule[]" value="{$doc_3.id}" title="{$doc_3.route}" pid="{$doc_3.pid}" {:explodeCheck($user_group['rule'],$doc_3['id'])?'checked="checked"':''}>{$doc_3.title}
+                                        </label>
+                                        <ol>
+                                            {volist name="doc_3.list" id="doc_4"}
+                                            {// 四级}
+                                            <li class="ta">
+                                                <label>
+                                                    <input type="checkbox" class="incheck" name="rule[]" value="{$doc_4.id}" title="{$doc_4.route}" pid="{$doc_4.pid}" {:explodeCheck($user_group['rule'],$doc_4['id'])?'checked="checked"':''}>{$doc_4.title}
+                                                </label>
+                                            </li>
+                                            {/volist}
+                                        </ol>
+                                    </dd>
+                                    {/volist}
+                                </dl>
+                            </li>
+                        {/volist}
+                        </ul>
+                    </div>
+                </div>
+                {/volist}
+
+                <div style="margin-left: 80px;">
+                    <input type="hidden" name="id" value="{$user_group.id|default=''}">
+                    <input type="button" class="inbtn" value="确认" id="formButton_group">
+                    <input type="button" class="inback" value="返回" onclick="window.history.back();">
+                </div>
+            </form>
+
+        </div>
+    </div>
+    
+    
+    <script>
+        layui.use(['layer'], function(){
+            const layer = layui.layer;
+            $('form #formButton_group').on('click',function(){
+                $(this).attr('disabled','disabled');
+                const id = $(this).attr('rel-id');
+                layer.load();
+                const formData = new FormData($('#myForm_group')[0]);
+                if(formData.get('rule[]')==null){
+                    formData.set('rule[]','');
+                }
+
+                parimesPost("/rule/accessAuthority",formData).then((res)=>{
+                    layer.msg(res.Msg);
+                    if(res.status==1){
+                        // 跳转
+                        window.location.href="/rule/authorityGroupList.html";
+                    }
+                }).catch((error)=>{
+                    layer.msg(error);
+                })
+                $(this).removeAttr('disabled');
+                layer.closeAll('loading');
+            })
+
+            
+            $('input[name="rule[]"]').change(function(){
+                console.log($(this).val());
+            })
+        })
+    </script>
+{/block}

@@ -1,0 +1,42 @@
+<div class="headerbar">
+	<div class="header">
+		<div class="logobox">
+			<a href="/" class="logo"><img src="__IMG__/logo01.png"></a>
+			<a href="/" class="logo02"><img src="__IMG__/logo02.png"></a>
+		</div>
+		<div class="links">
+			<ul class="fixed">
+				<li>
+					<a href="{:url('/boss/login')}" class="name">企业登录</a>
+				</li>
+				<li><a href="{:url('/weChatMiniProgram')}" class="name">职业者登录</a></li>
+			</ul>
+		</div>
+		<div class="nav">
+			<ul>
+				{volist name="category" id="doc"}
+				<li {eq name="doc.hov" value="1"}class="hov"{/eq}><a href="{:url('/'.$doc['url'])}">{$doc.title}</a></li>
+				{/volist}
+				
+			</ul>
+		</div>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+
+<div class="banner">
+    <div class="flexslider">
+        <ul class="slides">
+            <li>
+              <a href="#">
+                 <img src="__IMG__/banner.jpg" width="100%">
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                 <img src="__IMG__/banner.jpg" width="100%">
+              </a>
+            </li>            
+        </ul>
+    </div>
+</div>
