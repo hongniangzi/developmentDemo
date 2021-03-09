@@ -1,0 +1,197 @@
+{extend name="base/common" /}
+{block name="title"}栏目管理{/block}
+
+{block name="main"}
+<!--  -->
+    <div class="rbox">
+        <div class="top">
+            <h2>新增/编辑
+                {assign name="cate_lenght" value=":count($category)"/}
+                {volist name="category" id="doc"}
+                <a href="/admin{:strtoupper(substr($doc['rout_name'],0,1))}{:substr($doc['rout_name'],1)}/{$doc['rout_name']}List/column_id/{$doc.id}/.html">【{$doc.title}】{if condition="$cate_lenght!=$i"}>{/if}</a>
+                {/volist}
+            </h2>
+        </div>
+        <div class="btm">
+            <form id="myForm">
+                <table border="0" cellpadding="0" cellspacing="0" class="table02" width="400">
+                    <tr>
+                        <td align="right" width="200">所属栏目</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" class="intxt" value="{$category[$cate_lenght-1]['title']}" disabled="disabled">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">操作者</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="intxt" name="operator" value="{$Think.session.Nickname.username}" disabled="disabled"></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">标题</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="intxt" name="title" value=""></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">排序（倒叙排列）</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="intxt" name="sort"></td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">封面</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="cover-img">
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline">
+                                        <div class="layui-upload-list" style="margin:0">
+                                            <img src="__IMG__/default-img.jpg" id="srcimgurl-cover-img" class="layui-upload-img" style="width: 150px;">
+                                            <input type="hidden" name="cover_img">
+                                        </div>
+                                    </div>
+                                    <div class="layui-input-inline layui-btn-container" style="width: auto;">
+                                        <a href="javascript:;" class="layui-btn layui-btn-primary" id="cover-img">修改图片</a>
+                                    </div>
+                                    <div class="layui-form-mid layui-word-aux">封面图建议大小在100kb以内</div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="100">文本内容</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="width: 90%;">
+                                <textarea name="content" id="edit-1"></textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="150">描述（非必填）</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <textarea name="description" cols="40" rows="7" style="resize: none;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="150">点击量（非必填）</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" class="intxt" name="view">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="hidden" name="column_id" value="{$cate['id']}">
+                            <input type="button" class="inbtn" value="确认" id="formButton">
+                            <input type="button" class="inback" value="返回" onclick="window.history.back()">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    
+    <style>
+    </style>
+    <link rel="stylesheet" href="__JS__/layui/css/layui.css">
+    <link rel="stylesheet" href="__JS__/layui-cropper/cropper.css">
+    <script src="__JS__/layui-cropper/cropper.js"></script>
+    <script src="__JS__/layui-cropper/croppers.js"></script>
+    <script>
+        
+        layui.extend({
+            tinymce: '../tinymce/tinymce'
+        }).config({
+            base: '__JS__/layui-cropper/' //layui自定义layui组件目录
+        }).use(['layer','croppers','upload','tinymce','util'], function(){
+            const layer = layui.layer,
+                croppers = layui.croppers,
+                upload=layui.upload,
+                util=layui.util,
+                tinymce = layui.tinymce;
+
+
+            tinymce.render({
+                elem: "#edit-1",
+                height: 600,
+                width:'100%',
+                images_upload_handler:function(blobInfo, succFun, failFun){
+                    var file = blobInfo.blob();
+                    formData = new FormData();
+                    formData.append('file', file, file.name);//此处与源文档不一样
+                    parimesPost('/system/uploadImg',formData).then(res=>{
+                        if(res.status!=1){
+                            layer.msg(res.Msg,{'icon':7});
+                        }else{
+                            succFun(res.Msg);
+                        }
+                    },error=>layer.msg(error,{'icon':7}))
+                },
+                file_picker_callback: function(callback, value, meta) {
+                    if (meta.filetype == 'file') {
+                        callback('mypage.html', {text: 'My text'});
+                    }
+                    // Provide image and alt text for the image dialog
+                    if (meta.filetype == 'image') {
+                        callback('myimage.jpg', {alt: 'My alt text'});
+                    }
+                    // Provide alternative source and posted for the media dialog
+                    if (meta.filetype == 'media') {
+                        callback('movie.mp4', {source2: 'alt.ogg', poster: 'image.jpg'});
+                    }
+                }
+
+            });
+
+            // 栏目小图标上传
+            croppers.render({
+                elem: '#cover-img',
+                saveW:150,     //保存宽度
+                saveH:150,
+                mark:1/1,    //选取比例
+                area:'900px',  //弹窗宽度
+                url: "/system/uploadImg",  //图片上传接口返回和（layui 的upload 模块）返回的JOSN一样
+                done: function(res){ //上传完毕回调
+                    if(res.status==1){
+                        $("#srcimgurl-cover-img").attr('src',res.Msg);
+                        $(".cover-img input[name='cover_img']").val(res.id);
+                    }else{
+                        // 上传失败
+                        layer.msg(`上传失败：${res.Msg}`,{"icon":7});
+                    }
+                }
+            });
+
+            $('#myForm #formButton').click(function(){
+                $(this).attr('disabled','disabled');
+                layer.load();
+                const formData = new FormData($('#myForm')[0]);
+                formData.set('content',tinymce.get('#edit-1').getContent());
+                var url = `/admin${`{$cate['rout_name']}`.slice(0,1).toUpperCase()}${`{$cate['rout_name']}`.slice(1)}/{$cate['rout_name']}Add`;
+                promisePost(url,formData).then((res)=>{
+                    if(res.status==1){
+                        // 跳转
+                        layer.msg(res.Msg,{"icon":1,"time":800},()=>window.history.back());
+                    }else{
+                        layer.msg(res.Msg,{"icon":7});
+                    }
+                },(error)=>layer.msg(error,{"icon":7}))
+
+                $(this).removeAttr('disabled');
+                layer.closeAll('loading');
+            })
+        })
+    </script>
+{/block}

@@ -1,0 +1,155 @@
+{extend name="base/common" /}
+{block name="title"}栏目设置{/block}
+
+{block name="main"}
+<link rel="stylesheet" href="__CSS__/orgchart/jquery.orgchart.css" />
+<link rel="stylesheet" href="__CSS__/orgchart/index.css" />
+<script type="text/javascript" src="__JS__/jquery.orgchart.js" ></script>
+
+<div class="rbox">
+    <div class="top">
+        <h2>栏目设置</h2>
+    </div>
+    <div class="ctr">
+        <a href="{:url('/column/columnAdd')}" class="add">新增一级栏目</a>
+    </div>
+    <div id="chart-container"></div>
+</div>
+<style>
+    .r{background-color: #fff;}
+    #layerDemo1 .tips p{margin: 10px 0;font-size: 14px;}
+</style>
+<script type="text/javascript">
+    $(function(){
+        $(".title:not(':first')").each(function(){
+            var tit = $(this).html();
+            if(strlen(tit)>20){
+                $(this).addClass("special_prouduct")
+            }
+        })
+        //判断字节长度
+        function strlen(str){  
+            var len = 0;  
+            for (var i=0; i<str.length; i++) {   
+            var c = str.charCodeAt(i);   
+            //单字节加1   
+            if ((c >= 0x0001 && c <= 0x007e) || (0xff60<=c && c<=0xff9f)) {   
+                    len++;   
+                }   
+                else {   
+                    len+=2;   
+                }   
+            }   
+            return len;  
+        } 
+        //绝对居中
+        resize_view();
+        function resize_view(){
+           var ww = $(".orgchart").width();
+           var wh = $(".orgchart").height();
+           var f_height = $(".orgchart>table>tr>td> .node .title").height();	
+           
+           $(".orgchart").css({
+            //    "left":"50%",
+            //    "top":"50%",
+            //    "margin-left":-((wh/2)+(f_height/2)),
+            //    "margin-top":-(ww/2)
+           })	
+            if(ww > 750){
+                $(".orgchart").addClass("scale")
+            }
+        }
+
+        $(window).resize(function(){
+            resize_view();		
+        })
+
+        layui.use(['layer'], function(){
+            const layer = layui.layer;
+            var avtion = {
+                install:function(){
+                    promisePost("/column/columnList",new FormData()).then((res)=>{
+                        if(res.status==1){
+                            $('#chart-container').orgchart({
+                                'data' : res.Msg,
+                                'nodeContent': 'title',
+                                'direction': 'l2r'
+                            });	
+                        }else{
+                            layer.msg(res.Msg,{'icon':7});
+                        }
+                    },error=>layer.msg(error,{'icon':7}))
+                },
+                enlargeTitleprompt:function(){
+                    layer.tips($(this).text(),$(this),{tips: 1});
+                },
+                // 新增子栏目
+                addChildColunm:function(){
+                    const id=$(this).data('id');
+                    window.location.href = `/column/columnAdd/pid/${id}`;
+                },
+                goList:function(){
+                    const id = $(this).data('id');
+                    const rout_name = $(this).data('routname');
+                    const is_release = $(this).data('isrelease');
+                    const list_mouth = `/admin${rout_name.slice(0,1).toUpperCase() + rout_name.slice(1)}/${rout_name}List/column_id/${id}.html`;
+                    var str = `<div class="tips">
+                            <p>可前往<a href="${is_release==1? list_mouth:`javascript:;`}">&nbsp;<strong>列表入口${is_release==1? ``:`【禁言】`}</strong><a/></p>
+                            <p>可前往<a href="/column/columnEdit/id/${id}">&nbsp;<strong>编辑栏目</strong><a/></p>
+                            <p>可前往<a href="javascript:;">&nbsp;<strong>其他(开发中...)</strong><a/></p> 
+                        </div>`;
+                    layer.open({
+                        title: '栏目入口提示',
+                        type: 1,
+                        offset: 'auto', //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                        id: 'layerDemo1', //防止重复弹出
+                        content: '<div style="padding: 20px 100px;">'+ str +'</div>',
+                        btn: '关闭全部',
+                        btnAlign: 'c', //按钮居中
+                        shade: 0,//不显示遮罩
+                        yes: function(){
+                            layer.closeAll();
+                        }
+                    });
+                },
+                // 栏目状态修改
+                statusOperating:function(){
+                    var that = $(this);
+                    const status=$(this).data('status'),id=$(this).data('id');
+                    const formData = new FormData();
+                    formData.set('id',id);
+                    formData.set('status',status);
+                    promisePost('/column/columnStatus',formData).then(res=>{
+                        if(res.status==1){
+                            layer.msg(res.Msg,{'icon':1,'time':600},()=>window.location.reload());
+                        }else{
+                            layer.tips(res.Msg,that,{'tips':2});
+                        }
+                    },error=>layer.msg(error,{'icon':7}))
+                },
+            };
+            // 初始化递归栏目
+            avtion['install'].call($(this),this);
+            // 点击事件集
+            $('body').on('click','.layui-click',function(){
+                const method = $(this).data('method');
+                avtion[method]? avtion[method].call($(this),this):layer.msg('没有这个事件');
+            })
+            // 滑过事件集
+            $('body').on('mouseover','.layui-mouseover',function(){
+                const method = $(this).data('methods');
+                avtion[method]? avtion[method].call($(this),this):layer.msg('没有这个事件');
+            })
+            // 右击事件集
+            // $('body').on('mousedown','.layui-mousedown',function(e){
+            //     document.oncontextmenu = function() {return false;};
+            //     if(e.button == 2 ) {
+            //         const mousedown = $(this).data('mousedown');
+            //         avtion[mousedown]? avtion[mousedown].call($(this),this):layer.msg('没有这个事件');
+            //     }
+            // })
+        })
+        
+    })
+ </script>
+{/block}

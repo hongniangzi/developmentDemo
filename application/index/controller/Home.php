@@ -1,113 +1,125 @@
 <?php
 namespace app\index\controller;
+use app\admin\model\Column as ColumnModel; 
 use think\Controller;
 use think\Request;
 
+
 class Home extends Controller{
 
+    protected $nav;
     protected $url;
 
-    public function checkUrl(){
-        $url = $this->request->url();
-        if($url=='/'){
-            // 首页无需检测
-
-        }else{
-            // 其他页面需检测
-            $u = explode('/',substr($url,1));
-            $route = preg_replace(array('/\.html+?/','/(\?.+)|(\?)/'),array('',''),$u[0].'/'.$u[1]);
-            $this->url = "/{$route}";
-            $this->assign('url',$this->url);
-            define('PGYRULE', 'pgy_rule');
-
-            // 管理者权限检测start
-            $rule = cache(PGYRULE);
-            if(!$rule){
-                $rule = (new \app\index\model\Rule())->getRule();
-                cache(PGYRULE,$rule,6*60*24); // 权限路由信息储存24小时
-            }
-            // 确定是否需要检测($r有值需要检测,没有则不需要检测)
-            $r ='';
-            foreach($rule as $key =>$val){
-                if($route==$val['route']){
-                    $r = $val;
+    public function initialize(){
+        $ColumnModel = new ColumnModel();
+        $where_column[] = ['is_nav','eq',1];
+        $where_column[] = ['status','eq',1];
+        $column = $ColumnModel->getColumn($where_column,true,'id asc');
+        $childColumn = recursionGetClildrenColumn($column);
+        if($childColumn){
+            $childColumn = array_merge(array([
+                "title" => '首页',
+                "url"   => 'index',
+            ]),$childColumn);
+            $this->nav = $childColumn;
+        }
+        
+        $u = substr($this->request->url(),1);
+        $this->url = preg_replace(array('/\.html+?/','/(\?.+)|(\?)/'),array('',''),$u);
+        foreach($this->nav as $key => $val){
+            if($this->url=='' && $val['url']=='index'){
+                $this->nav[$key]['hov'] = 1;
+            }else{
+                if($this->url==$val['url']){
+                    $this->nav[$key]['hov'] = 1;
+                }else{
+                    $this->nav[$key]['hov'] = 0;
                 }
             }
             
-            if($r){
-                $Nickname = session('Nickname');
-                $user_group = (new \app\index\model\UserGroup())->field('id,rule')->whereIn('id',$Nickname['group'])->select()->toArray();
-                $groups ='';
-                foreach($user_group as $key =>$value){
-                    $groups .= $value['rule'].',';
-                }
-                $groups_str = substr($groups,0,-1);
-                // 排除顶级管理员权限受限
-                if(empty($groups_str) && $Nickname['id']!=1){
-                    if($this->isAjax()){
-                        $result = array('status'=>0,'Msg'=>'无权限访问');
-                        return $result;
-                    }else{
-                        $this->error('无访问权限');
-                    }
-                }elseif($Nickname['id']!=1){
-                    // 排除顶级管理员权限受限
-                    $group = explode(',',$groups_str);
-                    if(!in_array($r['id'],$group)){
-                        // 权限不足
-                        if($this->isAjax()){
-                            $result = array('status'=>0,'Msg'=>'无权限访问');
-                            return $result;
-                        }else{
-                            // return '无权限访问,这不是ajax,直接跳走';
-                            // $this->redirect('/user/center');
-                            $this->error('无访问权限');
-                        }
-                        
-                    }
-                }
+        }
+        $this->assign('nav',array_values($this->nav));
+    }
+
+    // public function is_login(){
+    //     // 检测用户是否登录状态
+    //     if(!session('userInfo')){
+    //         return $this->redirect('/index/login');
+    //     }
+    // }
+
+    // 递归获取当前顶级栏目下的第一个子栏目(递归第一个子栏目)
+    // protected static function getCategoryInfo($id=''){
+    //     if(!$id){
+    //         return false;
+    //     }
+    //     static $category;
+
+    //     $cate = (new ColumnModel())->getColumn(array('pid'=>$id),true,'id asc');
+    //     if(!empty($cate)){
+    //         foreach($cate as $key =>$value){
+    //             if($value['status']==1 && $value['is_nav']==1){
+    //                 $category = $value;
+    //                 $c = self::getCategoryInfo($value['id']);
+    //                 if($c==false){
+    //                     return $category;
+    //                 }else{
+    //                     return self::getCategoryInfo($value['id']);
+    //                 }
+    //                 break;
+    //             }
+    //         }
+    //         return false;
+    //     }else{
+    //         return false;
+    //     }
+    // }
+ 
+    // 递归获取各列表栏目当前位置
+    protected static function getCateLocation($id=''){
+        if(!$id){
+            return false;
+        }
+        static $category;
+        $cate = (new ColumnModel())->getColumn(array('pid'=>$id),true,'id asc');
+        foreach($cate as $key =>$value){
+            if($value['status']==1 && $value['is_nav']==1){
+                $category[] = $value;
+                self::getCateLocation($value['id']);
+                break;
             }
+        }
+        return $category;
+    }
+
+    // 各栏目模板位置
+    // 各栏目数据(最低级category栏目)以及导航位置
+    protected function articleTemplateLocation($data=''){
+        if(!$data['column_id']){
+            return $this->error('该栏目Id参数传输错误');
+        }
+        $category = (new ColumnModel())->getColumn(array('id'=>$data['column_id']),true);
+        if($category[0]['status']==1 && $category[0]['is_nav']==1){
+            $cate_location = self::getCateLocation($data['column_id']);
             
-            // 管理者权限检测end
-        }
-        
-    }
-
-    public function is_login(){
-        // 检测用户是否登录状态
-        if(!session('Nickname')){
-            return $this->redirect('/login/login');
-        }
-    }
-
-    // 数据新增修改删除
-    protected function addUpdate($class,$fun,$logArtion,$data,$type='新增'){
-        $result['status'] = 0;
-        
-        try{
-            $id = $class->$fun($data);
-
-        }catch(\Exception $e){
-            // 操作失败 记录LOG日志文件
-            indexLogFile($e);
-
-            $result['Msg'] = "失败原因可能:{$e->getMessage()}";
-            return json($result);
-        }
-        if(!empty($id)){
-            // 记录新增动作
-            $Nickname = session('Nickname');
-            logArtion($logArtion);
-
-            $result['status'] = 1;
-            $result['Msg'] = "{$type}成功√";
+            if($cate_location){
+                $cate_num = count($cate_location);
+                $cate_location>1? $category[0]=$cate_location[$cate_num-1]:'';
+            }else{
+                $cate_location = $category;
+            }
+            if($category[0]['status']==1 && $category[0]['is_nav']==1){
+                $this->assign('cate_location',$cate_location);
+                $this->assign('category',$category[0]);
+                $this->url = 'lists_'.$category[0]['rout_name'];
+            }else{
+                $this->error('页面已关闭 #2');
+            }
         }else{
-            $result['Msg'] = "{$type}失败";
+            $this->error('页面已关闭 #1');
         }
-        return $result;
+        
     }
-
-
 
     protected function method(){
         return $this->request->method();

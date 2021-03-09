@@ -7,14 +7,14 @@
 		<div class="links">
 			<ul class="fixed">
 				<li>
-					<a href="{:url('/boss/login')}" class="name">企业登录</a>
+					<a href="javascript:;" class="name">企业登录</a>
 				</li>
-				<li><a href="{:url('/weChatMiniProgram')}" class="name">职业者登录</a></li>
+				<li><a href="javascript:;" class="name">职业者登录</a></li>
 			</ul>
 		</div>
 		<div class="nav">
 			<ul>
-				{volist name="category" id="doc"}
+				{volist name="nav" id="doc"}
 				<li {eq name="doc.hov" value="1"}class="hov"{/eq}><a href="{:url('/'.$doc['url'])}">{$doc.title}</a></li>
 				{/volist}
 				

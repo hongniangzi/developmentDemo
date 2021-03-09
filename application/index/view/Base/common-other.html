@@ -1,12 +1,27 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>{notempty name="$title"}{$title}{/notempty}</title>
-<meta name="keywords" content="{notempty name='$keywords'}{$keywords}{/notempty}" />
-<meta name="description" content="{notempty name='$description'}{$description}{/notempty}" />
+{if condition="!empty($info)"}
+<title>{$info.title}-{:C('WEB_SITE_TITLE')}</title>
+{else/}
+<title>{$category.title}-{:C('WEB_SITE_TITLE')}</title>
+{/if}
+
+{if condition="$category['site_keywords']"}
+<meta name="keywords" content="{$category['site_keywords']}" />
+{else/}
+<meta name="keywords" content="{:C('WEB_SITE_KEYWORDS')}" />
+{/if}
+
+{if condition="$category['site_description']"}
+<meta name="description" content="{$category['site_description']}" />
+{else/}
+<meta name="description" content="{:C('WEB_SITE_DESCRIPTION')}" />
+{/if}
+
 <!-- <script src="__JS__/jquery-3.4.1.min.js"></script> -->
 <script type="text/javascript" src="__JS__/jquery-1.11.3.min.js"></script>
-<script src="__JS__/parmies-ajax.js"></script>
+<script src="__JS__/promise-ajax.js"></script>
 <script src="__JS__/layui/layui.js"></script>
 <link rel="stylesheet" type="text/css" href="__CSS__/index.css">
 </head>

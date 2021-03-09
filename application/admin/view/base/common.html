@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>{block name="title"}<!-- 标题 -->{/block}</title>
+<!-- <script src="__JS__/jquery-3.4.1.min.js"></script> -->
+<script type="text/javascript" src="__JS__/jquery-1.11.3.min.js"></script>
+<script src="__JS__/promise-ajax.js"></script>
+<script src="__JS__/layui/layui.js"></script>
+<link rel="stylesheet" type="text/css" href="__CSS__/style.css">
+</head>
+
+<body>
+    
+    {include file="Public/header"/}
+
+    <div class="contbox">
+        <!-- 左侧 -->
+        <div class="l">
+            {include file="Public/left"/}
+        </div>
+
+        <!-- 右侧 -->
+        <div class="r">
+            {block name="main"}
+            <!-- 主内容 -->
+            {/block}
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    
+    {include file="Public/footer"}
+    <script>
+        var h = $(window).height();
+	    $(document).ready(function(){
+		    $('.contbox').css('min-height', h);
+	    });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<?php /*a:3:{s:51:"D:\WWW\DEMO\application\index\view\index\index.html";i:1614002549;s:57:"D:\WWW\DEMO\application\index\view\base\common-index.html";i:1601373410;s:59:"D:\WWW\DEMO\application\index\view\Public\header-index.html";i:1614002545;}*/ ?>
+<?php /*a:3:{s:51:"D:\WWW\DEMO\application\index\view\index\index.html";i:1614002549;s:57:"D:\WWW\DEMO\application\index\view\base\common-index.html";i:1614939243;s:59:"D:\WWW\DEMO\application\index\view\Public\header-index.html";i:1614929406;}*/ ?>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -25,14 +25,14 @@
 		<div class="links">
 			<ul class="fixed">
 				<li>
-					<a href="<?php echo url('/boss/login'); ?>" class="name">企业登录</a>
+					<a href="javascript:;" class="name">企业登录</a>
 				</li>
-				<li><a href="<?php echo url('/weChatMiniProgram'); ?>" class="name">职业者登录</a></li>
+				<li><a href="javascript:;" class="name">职业者登录</a></li>
 			</ul>
 		</div>
 		<div class="nav">
 			<ul>
-				<?php if(is_array($category) || $category instanceof \think\Collection || $category instanceof \think\Paginator): $i = 0; $__LIST__ = $category;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$doc): $mod = ($i % 2 );++$i;?>
+				<?php if(is_array($nav) || $nav instanceof \think\Collection || $nav instanceof \think\Paginator): $i = 0; $__LIST__ = $nav;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$doc): $mod = ($i % 2 );++$i;?>
 				<li <?php if($doc['hov'] == '1'): ?>class="hov"<?php endif; ?>><a href="<?php echo url('/'.$doc['url']); ?>"><?php echo htmlentities($doc['title']); ?></a></li>
 				<?php endforeach; endif; else: echo "" ;endif; ?>
 				

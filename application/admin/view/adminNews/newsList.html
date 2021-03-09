@@ -1,0 +1,177 @@
+{extend name="base/common" /}
+{block name="title"}网站栏目{/block}
+
+{block name="main"}
+<link rel="stylesheet" href="__JS__/layui/css/layui.css">
+<link rel="stylesheet" href="__CSS__/orgchart/jquery.orgchart.css" />
+<link rel="stylesheet" href="__CSS__/orgchart/index.css" />
+<script type="text/javascript" src="__JS__/jquery.orgchart.js" ></script>
+
+<div class="rbox">
+    <div class="top">
+        <h2>栏目位置：
+            {assign name="cate_lenght" value=":count($cate_location)"/}
+            {volist name="cate_location" id="doc"}
+                {eq name='doc.is_release' value='1'}
+                <a href="/admin{:strtoupper(substr($doc['rout_name'],0,1))}{:substr($doc['rout_name'],1)}/{$doc['rout_name']}List/column_id/{$doc.id}/.html">
+                    【{$doc.title}】{if condition="$cate_lenght!=$i"}>{/if}
+                </a>
+                {else/}
+                <a href="javascript:;">【{$doc.title} <span class="location_tips">禁</span>】{if condition="$cate_lenght!=$i"}>{/if}</a>
+                {/eq}
+            {/volist}
+        </h2>
+    </div>
+    <div class="ctr">
+        {assign name="rout_url" value=":strtoupper(substr($category['rout_name'],0,1))"/}
+        <a href="/admin{$rout_url}{:substr($category['rout_name'],1)}/{$category['rout_name']}Add/column_id/{$category['id']}.html" class="add">新增数据</a>
+        <div class="seach">
+            <form id="mySeach">
+                <input type="text" class="intext" name="title" value="{$seach.title|default=''}" placeholder="标题 (模糊查询)">
+                <select name="status" class="intext" style="height: 40px;">
+                    <option value="">全部</option>
+                    {assign name="status" value="$seach.status|default=''"/}
+                    <option value="1" {eq name="status" value="1"}selected{/eq}>正常</option>
+                    <option value="2" {eq name="status" value="2"}selected{/eq}>待审核</option>
+                    <option value="3" {eq name="status" value="3"}selected{/eq}>已禁用</option>
+                    <option value="4" {eq name="status" value="4"}selected{/eq}>草稿箱</option>
+                </select>
+                <input type="button" class="inbtn seachButton" value="搜索">
+            </form>
+        </div>
+    </div>
+    <div class="btm">
+        <table class="table01" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <th width="20">ID</th>
+                <th width="200">标题</th>
+                <th width="50">封面</th>
+                <th width="200">描述</th>
+                <th width="50">点击量</th>
+                <th width="100">修改时间</th>
+                <th width="60">状态</th>
+                <th width="180">操作</th>
+            </tr>
+            {volist name="list" id="doc"}
+            <tr>
+                <td>{$doc.id}</td>
+                <td align="left">{if condition="mb_strlen($doc['title'])>20"}{$doc.title|mb_substr=0,20}...{else/}{$doc.title}{/if}</td>
+                <td align="center" valign="center"><img src="{$doc.cover_img|getImagePath}" width="50" style="display: inline-block;vertical-align: middle;"></td>
+                <td>{if condition="mb_strlen($doc['description'])>15"}{$doc.description|mb_substr=0,15}...{else/}{$doc.description}{/if}</td>
+                <td>{$doc.view}</td>
+                <td>{$doc.update_time|date="Y-m-d H:i"}</td>
+                <td class="status">
+                    {if condition="$doc['status']==1"}正常
+                    {elseif condition="$doc['status']==2"/}待审核
+                    {elseif condition="$doc['status']==3"/}已禁用
+                    {elseif condition="$doc['status']==4"/}草稿
+                    {/if}
+                </td>
+                <td style="line-height: 60px;">
+                    <span class="layui-click layui-btn layui-btn-sm layui-btn-normal" data-method="goEdit" data-id="{$doc.id}" data-columnid="{$category['id']}" ><i class="layui-icon">&#xe642;</i>编辑</span>
+                    <span class=" layui-click layui-btn layui-btn-sm layui-btn-warm" data-method="setStatus" data-id="{$doc.id}" data-status="{$doc.status}">
+                    {if condition="$doc['status']==1"}<i class="layui-icon">&#xe620;</i>禁用
+                    {else/}<i class="layui-icon">&#xe620;</i>启用
+                    {/if}
+                    </span>
+                    <span class="layui-click layui-btn layui-btn-sm layui-btn-danger" data-method="goDel" data-id="{$doc.id}"><i class="layui-icon">&#xe640;</i>删除</span>
+                </td>
+            </tr>
+            {/volist}
+        </table>
+        {:htmlspecialchars_decode($page->render)}
+    </div>
+</div>
+<style>
+    .top h2 .location_tips{display: inline-block;width: 20px;height: 20px;font-size: 10px;color: #f00e0e;border: 1px solid #c1c1c1;border-radius: 11px;line-height: 22px;text-align: center;}
+    .seach{float: right;}
+</style>
+<script src="__JS__/base.js"></script>
+<script>
+    layui.use(['layer'], function(){
+        const layer = layui.layer;
+
+
+        var avtion = {
+            // 去编辑
+            goEdit:function(){
+                const id = $(this).data('id'),
+                    column_id = $(this).data('columnid'),
+                    rout_name = `{$category['rout_name']}`;
+                const href = `/admin{$rout_url}${rout_name.substr(1)}/${rout_name}Add/column_id/${column_id}/id/${id}.html`;
+                window.location.href = href;
+            },
+            // 设置状态
+            setStatus:function(){
+                var that = $(this);
+                const id = $(this).data('id');
+                var status = $(this).data('status')==1?3:1;
+                const rout_name = `{$category['rout_name']}`;
+                const url = `/admin{$rout_url}${rout_name.substr(1)}/${rout_name}SetStatus`;
+                const formData = new FormData();
+                formData.set('id',id);
+                formData.set('status',status);
+                promisePost(url,formData).then((res)=>{
+                    layer.tips(res.Msg,that,{'tips':2,'time':800});
+                    if(res.status==1){
+                        var tips='--';
+                        var that_btn_text='--';
+                        switch(status){
+                            case 1:
+                                tips='正常';
+                                that_btn_text='禁用';
+                                break;
+                            case 3:
+                                tips='已禁用';
+                                that_btn_text='启用';
+                                break;
+                        }
+                        that.data('status',status);
+                        that.parents('td').siblings('td.status').text(tips);
+                        that.html(`<i class="layui-icon">&#xe620;</i>${that_btn_text}`);
+                    }
+                },(error)=>layer.msg(error,{"icon":7}))
+            },
+            // 去删除
+            goDel:function(){
+                layer.confirm('您确定需要删除吗?',(e)=>{
+                    var that = $(this);
+                    const id = $(this).data('id');
+                    const rout_name = `{$category['rout_name']}`;
+                    const url = `/admin{$rout_url}${rout_name.substr(1)}/${rout_name}Del`;
+                    const formData = new FormData();
+                    formData.set('id',id);
+                    promisePost(url,formData).then((res)=>{
+                        layer.msg(res.Msg,{'icon':1,'time':800},()=>{
+                            if(res.status==1){
+                                that.parents('tr').remove();
+                            }
+                        });
+                        
+                    },(error)=>layer.msg(error,{"icon":7}))
+                });
+            },
+        };
+        //点击事件集
+        $('body').on('click','.layui-click',function(){
+            const method = $(this).data('method');
+            avtion[method]? avtion[method].call($(this),this):layer.msg('没有这个事件');
+        })
+
+
+        // 筛选搜索
+        var submit = function(){
+            layer.load();
+            const formdata      = new FormData($('#mySeach')[0]);
+            const title         = formdata.get('title');
+            const status        = formdata.get('status');
+            
+            let url = Base64.encode(`title=${title}&status=${status}`);
+            let href = encodeURIComponent(url);
+            window.location.href = `${window.location.origin}${window.location.pathname}?seach=${href}`;
+        }
+        $('#mySeach .seachButton').bind("click",submit)
+        $('#mySeach input').bind("keyup",function(e){if(e.keyCode==13){submit()}})
+    })
+</script>
+{/block}

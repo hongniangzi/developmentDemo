@@ -117,8 +117,26 @@ function decryptData($encryptedData, $iv, &$data, $sessionKey, $appid) {
  * @return	string			文件路径
  */
 function getImagePath($id){
-	$img = (new app\index\model\File())->getFile(array('id'=>$id));
-	return !empty($img[0]) ? $img[0]['path_name']:'';
+	$img = (new app\admin\model\File())->getFile(array('id'=>$id));
+	return !empty($img[0]) ? $img[0]['path_name']:'/static/index/images/default-img.jpg';
+}
+
+/**
+ * 获取文本内容中部分文字作为描述
+ * @param	string		$content	编辑器文本内容
+ * @param	int			$number		获取文字数量
+ */
+function getContentStr($content,$number=150){
+	$des = '';
+	if($content){
+		$des = strip_tags(htmlspecialchars_decode($content));
+		$des = preg_replace('/\s*/iU', '', $des);
+		$des = preg_replace('/(&nbsp;)*/iU', '', strip_tags($des));
+	}
+
+	$description = $des ? htmlspecialchars(substr($des, 0, $number)) : '';
+
+	return $description;
 }
 
 /**
@@ -145,7 +163,7 @@ function checkVerify($code){
  */
 function C($name=''){
 	if($name){
-		$conf = (new \app\index\model\Config())->getSystemConfig(array('name'=>$name),'value');
+		$conf = (new \app\admin\model\Config())->getSystemConfig(array('name'=>$name),'value');
 		if(!empty($conf[0])){
 			return $conf[0]['value'];
 		}
